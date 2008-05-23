@@ -1,0 +1,51 @@
+#!/bin/sh
+
+##############################################################################
+# This script will build a Harmoni package and put it a ~/Releases directory.
+##############################################################################
+
+harmoniRepo=/home/afranco/repositories/public/harmoni.git
+
+destDir=~/Releases
+
+usage="Usage: `basename $0` -H <harmoni tag> [-h <harmoni repo>] [-d <dest dir>]"
+
+# Set up options
+while getopts ":H:h:d:" options; do
+	case $options in
+	H ) harmoniTag=$OPTARG;;
+	h ) harmoniRepo=$OPTARG;;
+	d ) destDir=$OPTARG;;
+	\? ) echo $usage
+		exit 1;;
+	* ) echo $usage
+		exit 1;;
+	
+	esac
+done
+
+# Test for Harmoni Tag
+if [  ! -n "$harmoniTag" ]
+then
+	echo $usage
+	exit 1
+fi
+
+#########################
+# Harmoni
+#########################
+# Clean up any previous harmoni builds
+if [ -e "$destDir/${harmoniTag}.zip" ]
+then
+	rm $destDir/${harmoniTag}.zip
+fi
+if [ -e "$destDir/${harmoniTag}" ]
+then
+	rm -rf $destDir/${harmoniTag}
+fi
+
+# Export Harmoni
+cd $harmoniRepo
+git-archive --format=zip --prefix=${harmoniTag}/ $harmoniTag > $destDir/${harmoniTag}.zip
+cd $destDir
+unzip -q ${harmoniTag}.zip

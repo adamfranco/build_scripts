@@ -1,0 +1,67 @@
+#!/bin/sh
+
+##############################################################################
+# This script will build a Harmoni package and put it a ~/Releases directory.
+# 
+# 3rd party libraries will also be downloaded from the git repository server
+# and copied into the appropriate places.
+##############################################################################
+
+polyphonyRepo=/home/afranco/repositories/public/polyphony.git
+
+destDir=~/Releases
+libraryUrl="http://slug.middlebury.edu/git/libraries"
+
+usage="Usage: `basename $0` -P <polyphony tag> [-p polyphony repo>] [-d <dest dir>]"
+
+# Set up options
+while getopts ":P:p:d:" options; do
+	case $options in
+	P ) polyphonyTag=$OPTARG;;
+	p ) polyphonyRepo=$OPTARG;;
+	d ) destDir=$OPTARG;;
+	\? ) echo $usage
+		exit 1;;
+	* ) echo $usage
+		exit 1;;
+	
+	esac
+done
+
+# Test for Polyphony Tag
+if [  ! -n "$polyphonyTag" ]
+then
+	echo $usage
+	exit 1
+fi
+
+#########################
+# Polyphony
+#########################
+# Clean up any previous polyphony builds
+if [ -e "$destDir/${polyphonyTag}.zip" ]
+then
+	rm $destDir/${polyphonyTag}.zip
+fi
+if [ -e "$destDir/${polyphonyTag}" ]
+then
+	rm -rf $destDir/${polyphonyTag}
+fi
+
+# Export polyphony
+cd $polyphonyRepo
+git-archive --format=zip --prefix=${polyphonyTag}/ $polyphonyTag > $destDir/${polyphonyTag}.zip
+cd $destDir
+unzip -q ${polyphonyTag}.zip
+rm ${polyphonyTag}.zip
+
+# Add the FCK Editor
+cd $destDir/${polyphonyTag}/javascript
+wget -q ${libraryUrl}/fckeditor.zip
+unzip -q fckeditor.zip
+rm fckeditor.zip
+cd $destDir
+
+# Re-Compress polyphony with the libraries added.
+cd $destDir
+zip -qr ${polyphonyTag}.zip ${polyphonyTag}
