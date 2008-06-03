@@ -1,0 +1,150 @@
+#!/bin/sh
+
+##############################################################################
+# This script will build a Segue 2 package and put it a ~/Releases directory.
+#
+# Harmoni and polyphony packages will be built as well and will be copied in to 
+# the appropriate places in the Segue package.
+#
+# 3rd party libraries will also be downloaded from the git repository server
+# and copied into the appropriate places.
+##############################################################################
+
+concertoRepo=/home/afranco/repositories/public/concerto.git
+
+destDir=~/Releases
+libraryUrl="http://slug.middlebury.edu/git/libraries"
+
+usage="Usage: `basename $0` -H <harmoni tag> -P <polyphony tag>  -V <viewer tag> -C <concerto tag> \n\t[-h <harmoni repo>] [-p polyphony repo>] [-v viewer repo>] [-c <concerto repo>] [-d <dest dir>]"
+
+# Set up options
+while getopts ":H:P:V:C:h:p:v:c:d:" options; do
+	case $options in
+	H ) harmoniTag=$OPTARG;;
+	P ) polyphonyTag=$OPTARG;;
+	C ) concertoTag=$OPTARG;;
+	V ) viewerTag=$OPTARG;;
+	h ) harmoniRepo=$OPTARG;;
+	p ) polyphonyRepo=$OPTARG;;
+	v ) viewerRepo=$OPTARG;;
+	c ) concertoRepo=$OPTARG;;
+	d ) destDir=$OPTARG;;
+	\? ) echo -e $usage
+		exit 1;;
+	* ) echo -e $usage
+		exit 1;;
+	
+	esac
+done
+
+# Test for Harmoni Tag
+if [  ! -n "$harmoniTag" ]
+then
+	echo -e $usage
+	exit 1
+fi
+
+# Test for Polyphony Tag
+if [  ! -n "$polyphonyTag" ]
+then
+	echo -e $usage
+	exit 1
+fi
+
+# Test for Viewer Tag
+if [  ! -n "$viewerTag" ]
+then
+	echo -e $usage
+	exit 1
+fi
+
+# Test for concerto Tag
+if [  ! -n "$concertoTag" ]
+then
+	echo -e $usage
+	exit 1
+fi
+
+# Ensure that we have an absolute path
+destDir=$(readlink -f $destDir)
+
+if [ ! -e "$destDir" ]
+then
+	echo "$destDir does not exist."
+	echo 
+	echo -e $usage
+	exit 2
+fi
+
+#########################
+# Harmoni
+#########################
+if [ -n "$harmoniRepo" ]
+then
+	build_Harmoni -H $harmoniTag -h $harmoniRepo -d $destDir
+else
+	build_Harmoni -H $harmoniTag -d $destDir
+fi
+
+#########################
+# Polyphony
+#########################
+if [ -n "$polyphonyRepo" ]
+then
+	build_Polyphony -P $polyphonyTag -p $polyphonyRepo -d $destDir
+else
+	build_Polyphony -P $polyphonyTag -d $destDir
+fi
+
+#########################
+# Viewer
+#########################
+# if [ -n "$viewerRepo" ]
+# then
+# 	build_Viewer -P $viewerTag -p $viewerRepo -d $destDir
+# else
+# 	build_Viewer -P $viewerTag -d $destDir
+# fi
+
+#########################
+# concerto
+#########################
+# Clean up any previous concerto builds
+if [ -e "$destDir/${concertoTag}.zip" ]
+then
+	rm $destDir/${concertoTag}.zip
+fi
+if [ -e "$destDir/${concertoTag}" ]
+then
+	rm -rf $destDir/${concertoTag}
+fi
+
+# Export concerto
+cd $concertoRepo
+git-archive --format=zip --prefix=${concertoTag}/ $concertoTag > $destDir/${concertoTag}.zip
+cd $destDir
+unzip -q ${concertoTag}.zip
+rm ${concertoTag}.zip
+
+# Add the DOMIT libraries
+cd $destDir/${concertoTag}/main
+wget -q ${libraryUrl}/domit.zip
+unzip -q domit.zip
+rm domit.zip
+cd $destDir
+
+# Add the PHP JPEG Metadat Toolkit libraries
+cd $destDir/${concertoTag}/main
+wget -q ${libraryUrl}/PHP_JPEG_Metadata_Toolkit_1.11.zip
+unzip -q PHP_JPEG_Metadata_Toolkit_1.11.zip
+rm PHP_JPEG_Metadata_Toolkit_1.11.zip
+cd $destDir
+
+# Add viewer, Polyphony, and Harmoni to concerto
+# cp -R $destDir/${viewerTag} $destDir/${concertoTag}/viewer
+cp -R $destDir/${harmoniTag} $destDir/${concertoTag}/main/harmoni
+cp -R $destDir/${polyphonyTag} $destDir/${concertoTag}/main/polyphony
+
+# Re-Compress concerto with the libraries added.
+cd $destDir
+zip -qr ${concertoTag}.zip ${concertoTag}
