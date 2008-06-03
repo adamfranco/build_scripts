@@ -1,0 +1,51 @@
+#!/bin/sh
+
+##############################################################################
+# This script will build a Viewer package and put it a ~/Releases directory.
+##############################################################################
+
+viewerRepo=/home/afranco/repositories/public/viewer.git
+
+destDir=~/Releases
+
+usage="Usage: `basename $0` -V <viewer tag> [-v <viewer repo>] [-d <dest dir>]"
+
+# Set up options
+while getopts ":V:v:d:" options; do
+	case $options in
+	V ) viewerTag=$OPTARG;;
+	v ) viewerRepo=$OPTARG;;
+	d ) destDir=$OPTARG;;
+	\? ) echo $usage
+		exit 1;;
+	* ) echo $usage
+		exit 1;;
+	
+	esac
+done
+
+# Test for viewer Tag
+if [  ! -n "$viewerTag" ]
+then
+	echo $usage
+	exit 1
+fi
+
+#########################
+# viewer
+#########################
+# Clean up any previous viewer builds
+if [ -e "$destDir/${viewerTag}.zip" ]
+then
+	rm $destDir/${viewerTag}.zip
+fi
+if [ -e "$destDir/${viewerTag}" ]
+then
+	rm -rf $destDir/${viewerTag}
+fi
+
+# Export viewer
+cd $viewerRepo
+git-archive --format=zip --prefix=${viewerTag}/ $viewerTag > $destDir/${viewerTag}.zip
+cd $destDir
+unzip -q ${viewerTag}.zip
