@@ -49,3 +49,11 @@ cd $viewerRepo
 git-archive --format=zip --prefix=${viewerTag}/ $viewerTag > $destDir/${viewerTag}.zip
 cd $destDir
 unzip -q ${viewerTag}.zip
+rm ${viewerTag}.zip
+
+# write the static version of the javascript file.
+php $destDir/${viewerTag}/viewer.js.php > $destDir/${viewerTag}/viewer.js
+
+# Re-Compress viewer with the static JS added.
+cd $destDir
+zip -qr ${viewerTag}.zip ${viewerTag}
