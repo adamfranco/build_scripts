@@ -99,12 +99,12 @@ fi
 #########################
 # Viewer
 #########################
-# if [ -n "$viewerRepo" ]
-# then
-# 	build_Viewer -P $viewerTag -p $viewerRepo -d $destDir
-# else
-# 	build_Viewer -P $viewerTag -d $destDir
-# fi
+if [ -n "$viewerRepo" ]
+then
+	build_Viewer -V $viewerTag -v $viewerRepo -d $destDir
+else
+	build_Viewer -V $viewerTag -d $destDir
+fi
 
 #########################
 # concerto
@@ -141,7 +141,7 @@ rm PHP_JPEG_Metadata_Toolkit_1.11.zip
 cd $destDir
 
 # Add viewer, Polyphony, and Harmoni to concerto
-# cp -R $destDir/${viewerTag} $destDir/${concertoTag}/viewer
+cp -R $destDir/${viewerTag} $destDir/${concertoTag}/viewer
 cp -R $destDir/${harmoniTag} $destDir/${concertoTag}/main/harmoni
 cp -R $destDir/${polyphonyTag} $destDir/${concertoTag}/main/polyphony
 
