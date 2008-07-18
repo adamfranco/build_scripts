@@ -13,7 +13,7 @@
 segueRepo=/home/afranco/repositories/public/segue-1.x.git
 
 destDir=~/Releases
-libraryUrl="http://slug.middlebury.edu/git/libraries"
+libraryUrl="http://slug.middlebury.edu/git/libraries/segue-1.x"
 
 usage="Usage: `basename $0` -S <segue tag> \n\t [-s <segue repo>] [-d <dest dir>]"
 
@@ -69,34 +69,20 @@ cd $destDir
 unzip -q ${segueTag}.zip
 rm ${segueTag}.zip
 
-# 
-# # Add the Scriptaculous libraries
-# cd $destDir/${segueTag}/javascript
-# wget -q ${libraryUrl}/scriptaculous-js.zip
-# unzip -q scriptaculous-js.zip
-# rm scriptaculous-js.zip
-# cd $destDir
-# 
-# # Add the JPGraph libraries
-# cd $destDir/${segueTag}/main
-# wget -q ${libraryUrl}/jpgraph.zip
-# unzip -q jpgraph.zip
-# rm jpgraph.zip
-# cd $destDir
-# 
-# # Add the DOMIT libraries
-# cd $destDir/${segueTag}/main
-# wget -q ${libraryUrl}/domit.zip
-# unzip -q domit.zip
-# rm domit.zip
-# cd $destDir
-# 
-# # Add the PHP JPEG Metadat Toolkit libraries
-# cd $destDir/${segueTag}/main
-# wget -q ${libraryUrl}/PHP_JPEG_Metadata_Toolkit_1.11.zip
-# unzip -q PHP_JPEG_Metadata_Toolkit_1.11.zip
-# rm PHP_JPEG_Metadata_Toolkit_1.11.zip
-# cd $destDir
+
+# Add the audio player libraries
+cd $destDir/${segueTag}
+wget -q ${libraryUrl}/audio-player.zip
+unzip -q audio-player.zip
+rm audio-player.zip
+cd $destDir
+
+# Add the FCKEditor libraries
+cd $destDir/${segueTag}/htmleditor/fckeditor
+wget -q ${libraryUrl}/fckeditor.zip
+unzip -q fckeditor.zip
+rm fckeditor.zip
+cd $destDir
 
 
 # Re-Compress Segue with the libraries added.
