@@ -4,7 +4,7 @@
 # This script will build a Harmoni package and put it a ~/Releases directory.
 ##############################################################################
 
-harmoniRepo=/home/afranco/repositories/public/harmoni.git
+harmoniRepo=git://github.com/adamfranco/harmoni.git
 
 destDir=~/Releases
 
@@ -44,8 +44,14 @@ then
 	rm -rf $destDir/${harmoniTag}
 fi
 
+# clone the repository to a temporary directory 
+mkdir /tmp/${harmoniTag}
+cd /tmp/${harmoniTag}
+git-clone --bare $harmoniRepo harmoni
+cd /tmp/${harmoniTag}/harmoni
+
 # Export Harmoni
-cd $harmoniRepo
 git-archive --format=zip --prefix=${harmoniTag}/ $harmoniTag > $destDir/${harmoniTag}.zip
 cd $destDir
+rm -Rf /tmp/${harmoniTag}
 unzip -q ${harmoniTag}.zip

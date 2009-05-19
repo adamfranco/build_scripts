@@ -7,10 +7,10 @@
 # and copied into the appropriate places.
 ##############################################################################
 
-polyphonyRepo=/home/afranco/repositories/public/polyphony.git
+polyphonyRepo=git://github.com/adamfranco/polyphony.git
 
 destDir=~/Releases
-libraryUrl="http://slug.middlebury.edu/git/libraries"
+libraryUrl="http://community.middlebury.edu/~afranco/git/libraries"
 
 usage="Usage: `basename $0` -P <polyphony tag> [-p polyphony repo>] [-d <dest dir>]"
 
@@ -48,10 +48,16 @@ then
 	rm -rf $destDir/${polyphonyTag}
 fi
 
+# clone the repository to a temporary directory 
+mkdir /tmp/${polyphonyTag}
+cd /tmp/${polyphonyTag}
+git-clone --bare $polyphonyRepo polyphony
+cd /tmp/${polyphonyTag}/polyphony
+
 # Export polyphony
-cd $polyphonyRepo
 git-archive --format=zip --prefix=${polyphonyTag}/ $polyphonyTag > $destDir/${polyphonyTag}.zip
 cd $destDir
+rm -Rf /tmp/${polyphonyTag}
 unzip -q ${polyphonyTag}.zip
 rm ${polyphonyTag}.zip
 

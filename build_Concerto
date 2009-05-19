@@ -10,10 +10,10 @@
 # and copied into the appropriate places.
 ##############################################################################
 
-concertoRepo=/home/afranco/repositories/public/concerto.git
+concertoRepo=git://github.com/adamfranco/concerto.git
 
 destDir=~/Releases
-libraryUrl="http://slug.middlebury.edu/git/libraries"
+libraryUrl="http://community.middlebury.edu/~afranco/git/libraries"
 
 usage="Usage: `basename $0` -H <harmoni tag> -P <polyphony tag>  -V <viewer tag> -C <concerto tag> \n\t[-h <harmoni repo>] [-p polyphony repo>] [-v viewer repo>] [-c <concerto repo>] [-d <dest dir>]"
 
@@ -119,10 +119,16 @@ then
 	rm -rf $destDir/${concertoTag}
 fi
 
+# clone the repository to a temporary directory 
+mkdir /tmp/${concertoTag}
+cd /tmp/${concertoTag}                                                                                                                
+git-clone --bare $concertoRepo concerto
+cd /tmp/${concertoTag}/concerto
+
 # Export concerto
-cd $concertoRepo
 git-archive --format=zip --prefix=${concertoTag}/ $concertoTag > $destDir/${concertoTag}.zip
 cd $destDir
+rm -Rf /tmp/${concertoTag}
 unzip -q ${concertoTag}.zip
 rm ${concertoTag}.zip
 

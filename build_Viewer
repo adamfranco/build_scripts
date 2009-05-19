@@ -44,10 +44,16 @@ then
 	rm -rf $destDir/${viewerTag}
 fi
 
+# clone the repository to a temporary directory 
+mkdir /tmp/${viewerTag}
+cd /tmp/${viewerTag}
+git-clone --bare $viewerRepo viewer
+cd /tmp/${viewerTag}/viewer
+
 # Export viewer
-cd $viewerRepo
 git-archive --format=zip --prefix=${viewerTag}/ $viewerTag > $destDir/${viewerTag}.zip
 cd $destDir
+rm -Rf /tmp/${viewerTag}
 unzip -q ${viewerTag}.zip
 rm ${viewerTag}.zip
 

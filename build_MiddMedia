@@ -10,10 +10,10 @@
 # and copied into the appropriate places.
 ##############################################################################
 
-middmediaRepo=/home/afranco/repositories/public/middmedia.git
+middmediaRepo=git://github.com/adamfranco/middmedia.git
 
 destDir=~/Releases
-libraryUrl="http://slug.middlebury.edu/git/libraries"
+libraryUrl="http://community.middlebury.edu/~afranco/git/libraries"
 
 usage="Usage: `basename $0` -H <harmoni tag> -P <polyphony tag> -M <middmedia tag> \n\t[-h <harmoni repo>] [-p polyphony repo>] [-m <middmedia repo>] [-d <dest dir>]"
 
@@ -100,10 +100,16 @@ then
 	rm -rf $destDir/${middmediaTag}
 fi
 
+# clone the repository to a temporary directory 
+mkdir /tmp/${middmediaTag}
+cd /tmp/${middmediaTag}                                                                                                                    
+git-clone --bare $middmediaRepo middmedia                                                                                                      
+cd /tmp/${middmediaTag}/middmedia
+
 # Export middmedia 
-cd $middmediaRepo
 git-archive --format=zip --prefix=${middmediaTag}/ $middmediaTag > $destDir/${middmediaTag}.zip
 cd $destDir
+rm -Rf /tmp/${middmediaTag}
 unzip -q ${middmediaTag}.zip
 rm ${middmediaTag}.zip
 

@@ -10,10 +10,10 @@
 # and copied into the appropriate places.
 ##############################################################################
 
-segueRepo=/home/afranco/repositories/public/segue.git
+segueRepo=git://github.com/adamfranco/segue.git
 
 destDir=~/Releases
-libraryUrl="http://slug.middlebury.edu/git/libraries"
+libraryUrl="http://community.middlebury.edu/~afranco/git/libraries"
 
 usage="Usage: `basename $0` -H <harmoni tag> -P <polyphony tag> -S <segue tag> \n\t[-h <harmoni repo>] [-p polyphony repo>] [-s <segue repo>] [-d <dest dir>]"
 
@@ -100,10 +100,16 @@ then
 	rm -rf $destDir/${segueTag}
 fi
 
+# clone the repository to a temporary directory 
+mkdir /tmp/${segueTag}
+cd /tmp/${segueTag}
+git-clone --bare $segueRepo segue
+cd /tmp/${segueTag}/segue
+
 # Export segue
-cd $segueRepo
 git-archive --format=zip --prefix=${segueTag}/ $segueTag > $destDir/${segueTag}.zip
 cd $destDir
+rm -Rf /tmp/${segueTag}
 unzip -q ${segueTag}.zip
 rm ${segueTag}.zip
 
